@@ -22,19 +22,19 @@ public class CCHeaderRule implements Rule {
         String alg = clientCredential.getAlgorithm();
 
         if (typ == null || typ.isEmpty()) {
-            throw new RuleViolationException("Missing typ header claim");
+            throw new RuleViolationException("Missing Client Credential typ header");
         }
 
         if (alg == null || alg.isEmpty()) {
-            throw new RuleViolationException("Missing alg header claim");
+            throw new RuleViolationException("Missing Client Credential alg header");
         }
 
         if (alg.equals(NONE)) {
-            throw new RuleViolationException("Invalid alg header claim value");
+            throw new RuleViolationException("Invalid Client Credential alg header value");
         }
 
         if (!encryptionTypes.contains(alg)) {
-            throw new RuleViolationException("Invalid alg header claim value");
+            throw new RuleViolationException("Invalid Client Credential alg header value");
         }
     }
 }

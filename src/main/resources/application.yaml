@@ -5,7 +5,7 @@ keys:
 authorities:
     applications:
          -
-          name: "account.manager.service"
+          name: "client.node"
           authorities:
                 - "create:account"
                 - "read:account"

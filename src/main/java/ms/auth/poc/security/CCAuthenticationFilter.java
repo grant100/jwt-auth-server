@@ -1,5 +1,6 @@
 package ms.auth.poc.security;
 
+import ms.auth.poc.security.tokens.CCAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,12 +16,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class AuthenticationFilter extends OncePerRequestFilter {
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
+public class CCAuthenticationFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(CCAuthenticationFilter.class);
 
     private AuthenticationManager authenticationManager;
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager) {
+    public CCAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
 
@@ -35,7 +36,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String jwt = header.replace(HttpContract.BEARER, "");
-            Authentication authRequest = new UsernamePasswordAuthenticationToken(SecurityContract.JWT, jwt);
+            Authentication authRequest = new CCAuthenticationToken(SecurityContract.CC_TOKEN, jwt);
 
             // delegate to AuthenticationManager to iterate AuthenticationProvider implementation(s)
             Authentication authResults = authenticationManager.authenticate(authRequest);

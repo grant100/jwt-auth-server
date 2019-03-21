@@ -1,7 +1,5 @@
 package ms.auth.poc.security;
 
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.InvalidClaimException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -13,42 +11,31 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
-public class JAuthenticationProvider implements AuthenticationProvider {
-    private static final Logger logger = LoggerFactory.getLogger(JAuthenticationProvider.class);
-
-    @Autowired
-    private KeyManager keyManager;
+public class IDAuthenticationProvider  implements AuthenticationProvider {
+    private static final Logger logger = LoggerFactory.getLogger(IDAuthenticationProvider.class);
 
     @Autowired
     private RuleProcessor ruleProcessor;
 
-    @Autowired
-    private AuthorityManager authorityManager;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         try {
 
             String token = authentication.getCredentials().toString();
-            logger.info("Attempting JWT authentication");
+            logger.info("Attempting ID Token authentication");
 
-            DecodedJWT clientCredential = com.auth0.jwt.JWT.decode(token);
+            DecodedJWT idToken = com.auth0.jwt.JWT.decode(token);
 
-            String issuer = clientCredential.getIssuer();
-            String subject = clientCredential.getSubject();
+            String issuer = idToken.getIssuer();
+            String subject = idToken.getSubject();
             logger.info("Received JWT from issuer {} with subject {}", issuer, subject);
 
-            ruleProcessor.processRules(clientCredential);
+            ruleProcessor.runIDTokenRules(idToken);
             logger.info("Validated JWT signature and expiry for issuer {} and subject {}", issuer, subject);
-
 
             // Client provided a valid token
             User user = new User(issuer, authentication.getCredentials().toString(), true, true, true, true, null);
@@ -58,20 +45,19 @@ public class JAuthenticationProvider implements AuthenticationProvider {
 
             // Authentication failed
         } catch (InvalidClaimException ice) {
-            logger.error("JWT claims are invalid", ice);
+            logger.error("ID Token JWT claims are invalid", ice);
             throw ice;
         } catch (JWTVerificationException jwtve) {
-            logger.error("JWT verification failed", jwtve);
+            logger.error("ID Token JWT verification failed", jwtve);
             throw jwtve;
         } catch (Exception e) {
             logger.error("Failed to authorize JWT", e);
-            throw new BadCredentialsException("Failed to authenticate",e);
+            throw new BadCredentialsException("Failed to authenticate ID Token",e);
         }
     }
 
-
     @Override
     public boolean supports(Class<?> authentication) {
-        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+        return IDAuthenticationProvider.class.isAssignableFrom(authentication);
     }
 }

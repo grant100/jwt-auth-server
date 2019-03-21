@@ -1,0 +1,13 @@
+keys:
+   key:
+         account.manager.service: j98Nbf765bdiwD5ngks829450ykh287f7vydhGDS1
+
+authorities:
+    applications:
+         -
+          name: "account.manager.service"
+          authorities:
+                - "create:account"
+                - "read:account"
+                - "update:account"
+                - "delete:account"

@@ -26,7 +26,7 @@ public class WebSecurity {
             http
                     .cors().and().csrf().disable().rememberMe().disable().logout().disable().formLogin().disable().httpBasic().disable()
                     .authorizeRequests()
-                    .antMatchers("/id-token").anonymous()
+                    .antMatchers("/id-token").authenticated()
                     .anyRequest().denyAll() // any url that has not been matched is denied by default
                     .and()
                     .addFilterAt(new AuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class)

@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @ConfigurationProperties(prefix = "keys")
 public class KeyManager {
@@ -30,7 +31,13 @@ public class KeyManager {
         return secret;
     }
 
-    boolean isKnownIssuer(String issuer) {
+    public Set<String> getIssuers(String issuer){
+        Set<String> issuers =  keys.keySet();
+        issuers.remove(issuer);
+        return issuers;
+    }
+
+    public boolean isKnownIssuer(String issuer) {
         return keys.containsKey(issuer);
     }
 }

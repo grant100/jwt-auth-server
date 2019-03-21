@@ -42,37 +42,19 @@ public class JAuthenticationProvider implements AuthenticationProvider {
 
             DecodedJWT clientCredential = com.auth0.jwt.JWT.decode(token);
 
-            String issuer = jwt.getIssuer();
-            String subject = jwt.getSubject();
+            String issuer = clientCredential.getIssuer();
+            String subject = clientCredential.getSubject();
             logger.info("Received JWT from issuer {} with subject {}", issuer, subject);
 
-
-            // verify token header e.g. immediately invalidate (alg=none) tokens
-            if (!verifyHeader(jwt)) {
-                throw new InvalidClaimException("Invalid JWT Header, header does not meet contract");
-            }
-            logger.info("Validated JWT header contract for issuer {} and subject {}", issuer, subject);
-
-
-            // verify signature
-            Algorithm algorithm = Algorithm.HMAC256(keyManager.findKey(issuer));
-            JWTVerifier verifier = com.auth0.jwt.JWT.require(algorithm)
-                    .acceptExpiresAt(5) // 5 second leeway
-                    .withIssuer(issuer)
-                    .withAudience(SecurityContract.ID_TOKEN)
-                    .build();
-
-            verifier.verify(token);
-
+            ruleProcessor.processRules(clientCredential);
             logger.info("Validated JWT signature and expiry for issuer {} and subject {}", issuer, subject);
 
-            Collection<? extends GrantedAuthority> authorities = getAuthorities(issuer);
 
             // Client provided a valid token
-            User user = new User(issuer, authentication.getCredentials().toString(), true, true, true, true, authorities);
+            User user = new User(issuer, authentication.getCredentials().toString(), true, true, true, true, null);
 
             // return a trusted token
-            return new UsernamePasswordAuthenticationToken(user, token, authorities);
+            return new UsernamePasswordAuthenticationToken(user, token, null);
 
             // Authentication failed
         } catch (InvalidClaimException ice) {
@@ -87,28 +69,6 @@ public class JAuthenticationProvider implements AuthenticationProvider {
         }
     }
 
-    /**
-     * Returns false if incoming JWT doesn't meet Algorithm or Type contract
-     *
-     * @param jwtToken DecodedJWT
-     */
-    boolean verifyHeader(DecodedJWT jwtToken) {
-        if (jwtToken.getAlgorithm().equals("none")){
-            return false;
-        }
-        return true;
-    }
-
-    Collection<? extends GrantedAuthority> getAuthorities(String issuer) throws Exception {
-        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        List<String> authorities = authorityManager.getEntitlementsByIssuer(issuer);
-
-        for (String authority : authorities) {
-            authorityList.add(new SimpleGrantedAuthority(authority));
-        }
-        logger.debug("Assigning authorities(s) {} for {}", authorities, issuer);
-        return authorityList;
-    }
 
     @Override
     public boolean supports(Class<?> authentication) {

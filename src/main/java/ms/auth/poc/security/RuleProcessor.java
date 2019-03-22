@@ -43,12 +43,12 @@ public class RuleProcessor {
 
     private List<Rule> setupClientCredentialRules(DecodedJWT clientCredential) throws Exception {
         final String issuer = clientCredential.getIssuer();
-        Set<String> issuers = keyManager.getIssuers(issuer);
+        Set<String> issuers = keyManager.getIssuers();
         String audience = tokenProperties.getAuthnServerAudience();
 
         Algorithm algorithm = Algorithm.HMAC256(keyManager.findKey(issuer));
         CCHeaderRule headerRule = new CCHeaderRule(clientCredential, Arrays.asList("HS256"));
-        CCPayloadRule payloadRule = new CCPayloadRule(clientCredential, issuers);
+        CCPayloadRule payloadRule = new CCPayloadRule(clientCredential, issuers, audience);
         CCSignatureRule signatureRule = new CCSignatureRule(clientCredential, algorithm, audience);
         return Arrays.asList(headerRule, payloadRule, signatureRule);
     }
@@ -56,7 +56,7 @@ public class RuleProcessor {
 
     private List<Rule> setupIDTokenRules(DecodedJWT idToken) throws Exception {
         String issuer = tokenProperties.getAuthnServerIssuer();
-        Set<String> subjects = keyManager.getIssuers(issuer);
+        Set<String> subjects = keyManager.getIssuers();
         KeyPair keyPair = keyService.getKeyPair();
         Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) keyPair.getPublic(), (RSAPrivateKey) keyPair.getPrivate());
 

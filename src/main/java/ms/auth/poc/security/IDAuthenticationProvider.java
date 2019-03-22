@@ -1,17 +1,18 @@
 package ms.auth.poc.security;
 
-import com.auth0.jwt.exceptions.InvalidClaimException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import ms.auth.poc.security.tokens.IDAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
+
+import java.util.ArrayList;
 
 
 public class IDAuthenticationProvider  implements AuthenticationProvider {
@@ -37,27 +38,22 @@ public class IDAuthenticationProvider  implements AuthenticationProvider {
             ruleProcessor.runIDTokenRules(idToken);
             logger.info("Validated JWT signature and expiry for issuer {} and subject {}", issuer, subject);
 
+
             // Client provided a valid token
-            User user = new User(issuer, authentication.getCredentials().toString(), true, true, true, true, null);
+            User user = new User(issuer, authentication.getCredentials().toString(), true, true, true, true, new ArrayList<>());
 
             // return a trusted token
             return new UsernamePasswordAuthenticationToken(user, token, null);
 
             // Authentication failed
-        } catch (InvalidClaimException ice) {
-            logger.error("ID Token JWT claims are invalid", ice);
-            throw ice;
-        } catch (JWTVerificationException jwtve) {
-            logger.error("ID Token JWT verification failed", jwtve);
-            throw jwtve;
-        } catch (Exception e) {
+        }  catch (Exception e) {
             logger.error("Failed to authorize JWT", e);
-            throw new BadCredentialsException("Failed to authenticate ID Token",e);
+            throw new CredentialsExpiredException("Failed to authenticate JWT",e);
         }
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return IDAuthenticationProvider.class.isAssignableFrom(authentication);
+        return IDAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }

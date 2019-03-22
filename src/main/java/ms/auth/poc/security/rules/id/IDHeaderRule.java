@@ -31,7 +31,7 @@ public class IDHeaderRule implements Rule {
             throw new RuleViolationException("Invalid ID Token alg header value");
         }
 
-        if (alg.equals(ALG)) {
+        if (!alg.equals(ALG)) {
             throw new RuleViolationException("Invalid ID Token alg header value");
         }
     }

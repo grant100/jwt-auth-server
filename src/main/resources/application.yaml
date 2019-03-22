@@ -1,6 +1,6 @@
-keys:
-   key:
-         account.manager.service: j98Nbf765bdiwD5ngks829450ykh287f7vydhGDS1
+hmac-keys:
+   keys:
+       client.node: j98Nbf765bdiwD5ngks829450ykh287f7vydhGDS1
 
 authorities:
     applications:

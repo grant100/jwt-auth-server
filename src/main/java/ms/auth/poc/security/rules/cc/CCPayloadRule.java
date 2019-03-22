@@ -5,15 +5,18 @@ import ms.auth.poc.security.exceptions.RuleViolationException;
 import ms.auth.poc.security.rules.Rule;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class CCPayloadRule implements Rule {
 
     private Set<String> issuers;
+    private String audience;
     private DecodedJWT clientCredential;
 
-    public CCPayloadRule(DecodedJWT clientCredential, Set<String> issuers) {
+    public CCPayloadRule(DecodedJWT clientCredential, Set<String> issuers, String audience) {
         this.issuers = issuers;
+        this.audience = audience;
         this.clientCredential = clientCredential;
     }
 
@@ -22,6 +25,7 @@ public class CCPayloadRule implements Rule {
         Date iat = clientCredential.getIssuedAt();
         Date exp = clientCredential.getExpiresAt();
         String iss = clientCredential.getIssuer();
+        List<String> aud = clientCredential.getAudience();
 
         if (iat == null) {
             throw new RuleViolationException("Missing Client Credential payload iat");
@@ -37,6 +41,14 @@ public class CCPayloadRule implements Rule {
 
         if(!issuers.contains(iss)){
             throw new RuleViolationException("Invalid Client Credential payload iss value");
+        }
+
+        if(aud == null || aud.isEmpty()){
+            throw new RuleViolationException("Missing Client Credential payload aud");
+        }
+
+        if(!aud.contains(audience)){
+            throw new RuleViolationException("Invalid Client Credential payload aud");
         }
     }
 }

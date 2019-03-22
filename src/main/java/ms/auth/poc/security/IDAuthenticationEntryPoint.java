@@ -1,16 +1,20 @@
 package ms.auth.poc.security;
 
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class IDAuthenticationEntryPoint implements org.springframework.security.web.AuthenticationEntryPoint {
+public class IDAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Unauthorized");
+        response.setContentType("application/json");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getOutputStream().println("{\"success\": false}");
+        //response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Unauthorized");
     }
 }

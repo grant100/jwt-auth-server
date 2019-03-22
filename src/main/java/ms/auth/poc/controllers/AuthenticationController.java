@@ -1,26 +1,25 @@
 package ms.auth.poc.controllers;
 
-import com.auth0.jwt.JWT;
+
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
+
 import ms.auth.poc.WebSecurity;
+import ms.auth.poc.security.ClaimConstants;
 import ms.auth.poc.security.KeyService;
 import ms.auth.poc.security.TokenProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class AuthenticationController {
@@ -33,24 +32,30 @@ public class AuthenticationController {
         this.tokenProperties = tokenProperties;
     }
 
-    @RequestMapping(value = WebSecurity.CC_TOKEN_ENDPOINT, method = RequestMethod.GET)
+    @RequestMapping(value = WebSecurity.ID_TOKEN_ENDPOINT, method = RequestMethod.POST)
+    public Map authenticate(){
+        return Collections.singletonMap("success",true);
+    }
+
+    @RequestMapping(value = WebSecurity.CC_TOKEN_ENDPOINT, method = RequestMethod.POST)
     public String idToken(Authentication authentication) {
         String token = null;
         String[] claims = null;
 
-        Collection<? extends GrantedAuthority> authorities;
-        if(authentication != null){
-            authorities = authentication.getAuthorities();
-
+        if (authentication != null) {
+            List<GrantedAuthority >authorities = new ArrayList<>(authentication.getAuthorities());
             if (!authorities.isEmpty()) {
-                claims = (String[]) authorities.toArray();
+                claims = new String[authorities.size()];
+                for(int i = 0; i<authorities.size(); i++){
+                    claims[i] = authorities.get(i).getAuthority();
+                }
             }
         }
 
         try {
             token = generate(authentication.getName(), tokenProperties.getAuthnServerIssuer(), claims);
         } catch (Exception e) {
-            // 5? Error Handling Response?
+            // TODO 5? Error Handling Response?
         }
 
         return token;
@@ -60,7 +65,7 @@ public class AuthenticationController {
         //logger.debug("Creating token for subject {}", subject);
         Calendar now = Calendar.getInstance();
         long time = now.getTimeInMillis();
-        Date expiry = new Date(time + (30 * 1000));
+        Date expiry = new Date(time + (1800 * 1000));
         KeyPair keyPair = keyService.getKeyPair();
         Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) keyPair.getPublic(), (RSAPrivateKey) keyPair.getPrivate());
         String token = com.auth0.jwt.JWT
@@ -69,30 +74,30 @@ public class AuthenticationController {
                 .withIssuer(issuer)
                 .withIssuedAt(new Date())
                 .withExpiresAt(expiry)
-                .withArrayClaim("aut", claims)
+                .withArrayClaim(ClaimConstants.AUT, claims)
                 .sign(algorithm);
 
         return token;
     }
 
+    @ResponseBody
     @RequestMapping(value = "/cc")
-    public String cc(){
-        String token;
+    public String cc() {
+        String token = null;
         try {
             Calendar now = Calendar.getInstance();
             long time = now.getTimeInMillis();
-            Date expiry = new Date(time + (timeout * 1000));
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            this.token = com.auth0.jwt.JWT
+            Date expiry = new Date(time + (1800 * 1000));
+            Algorithm algorithm = Algorithm.HMAC256("j98Nbf765bdiwD5ngks829450ykh287f7vydhGDS1");
+            token = com.auth0.jwt.JWT
                     .create()
-                    .withSubject(SUBJECT)
-                    .withIssuer(issuer)
-                    .withAudience(SecurityConstants.API_NAME)
+                    .withIssuer("client.node")
                     .withIssuedAt(new Date())
+                    .withAudience(tokenProperties.getAuthnServerAudience())
                     .withExpiresAt(expiry)
                     .sign(algorithm);
         } catch (Exception uee) {
-            throw new TokenException(uee);
+            //
         }
         return token;
     }

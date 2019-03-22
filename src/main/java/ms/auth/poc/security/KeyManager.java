@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@ConfigurationProperties(prefix = "keys")
+@ConfigurationProperties(prefix = "hmac-keys")
 public class KeyManager {
 
     private Map<String, String> keys;
@@ -31,10 +31,8 @@ public class KeyManager {
         return secret;
     }
 
-    public Set<String> getIssuers(String issuer){
-        Set<String> issuers =  keys.keySet();
-        issuers.remove(issuer);
-        return issuers;
+    public Set<String> getIssuers(){
+        return keys.keySet();
     }
 
     public boolean isKnownIssuer(String issuer) {

@@ -39,16 +39,18 @@ public class CCPayloadRule implements Rule {
             throw new RuleViolationException("Missing Client Credential payload iss");
         }
 
-        if(!issuers.contains(iss)){
+        if (!issuers.contains(iss)) {
             throw new RuleViolationException("Invalid Client Credential payload iss value");
         }
 
-        if(aud == null || aud.isEmpty()){
+        if (aud == null || aud.isEmpty()) {
             throw new RuleViolationException("Missing Client Credential payload aud");
         }
 
-        if(!aud.contains(audience)){
+        if (!aud.contains(audience)) {
             throw new RuleViolationException("Invalid Client Credential payload aud");
         }
+
     }
 }
+

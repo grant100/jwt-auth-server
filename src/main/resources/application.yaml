@@ -1,13 +1,37 @@
-hmac-keys:
+client-keys:
    keys:
-       client.node: j98Nbf765bdiwD5ngks829450ykh287f7vydhGDS1
+       #client.node: j98Nbf765bdiwD5ngks829450ykh287f7vydhGDS1
+       client.node: -----BEGIN CERTIFICATE-----
+                    MIIDazCCAlOgAwIBAgIEGQSlDDANBgkqhkiG9w0BAQsFADBmMQswCQYDVQQGEwJV
+                    VDENMAsGA1UECBMEVXRhaDENMAsGA1UEBxMET3JlbTEPMA0GA1UEChMGQ2xpZW50
+                    MRAwDgYDVQQLEwdDbGllbnQgMRYwFAYDVQQDEw1HcmFudCBTb3dhcmRzMB4XDTE5
+                    MDMyMjE3NDQ0MloXDTE5MDYyMDE3NDQ0MlowZjELMAkGA1UEBhMCVVQxDTALBgNV
+                    BAgTBFV0YWgxDTALBgNVBAcTBE9yZW0xDzANBgNVBAoTBkNsaWVudDEQMA4GA1UE
+                    CxMHQ2xpZW50IDEWMBQGA1UEAxMNR3JhbnQgU293YXJkczCCASIwDQYJKoZIhvcN
+                    AQEBBQADggEPADCCAQoCggEBAKn6ZWPDHEGdJlSNKygYl5j9AOucoLtQTFGV0/Ke
+                    ld6WIIZCuVltE1fRTSNKIhrfEAEWlLqCCfkC6DQU8OJy9SWNbW7PoAqayZHWH16X
+                    jh8LrWESZGLP6DV3z616UfyTlRca2ld2Tsmh3OiFV8JSh82PvUwzGlM2d0x00FDf
+                    RVEXv+LhJ2t6BqeqPRtWXAKIitaTuhvvCtoctWXmk0cmOnA8gGLJ0lQ/TmUHPfPE
+                    zuYsgzLsSIr0SiJvbjCsFPE+FVHK7FJ4xAzg02qmsFPbDfguntXrmZA0REIxCnQv
+                    PquJp5SbHTO6ccRZwRzkZosErKzcnHyl5iYuDl9ueEgXB/sCAwEAAaMhMB8wHQYD
+                    VR0OBBYEFBFNZTW2U34TA899uF2Wh+Pht3YNMA0GCSqGSIb3DQEBCwUAA4IBAQAr
+                    r7SO7VFxSLc5FYSvWO7Sf+Qus8gavIfaYaO53eJtyB6KRLXN3K+63BGEaJ5GLbx7
+                    CBGgkhe+Kko146GdRVpvQ783afLSBWgGYBV6OHL03fzyZXqmXUZyNr6p/Ub0NuXc
+                    I/AAqgqk5G34fc+gh8N53F7HVn1+dIWm8f0kA+ckrA9Alk9PsldIga3VOZnPH3aK
+                    C58/ud5osSEXO+eNwF6R9iyhZqljou6QvzQyvwglTjIHAUl6q6wiUEM3zwH5fw4J
+                    bgQUeeHe310gZzOdap/Ut54W3jXia2OoNot8yJ6kpGwLtNyZSBywea3sJHywhzrM
+                    uMcPi7UUi9TXZzdItp/X
+                    -----END CERTIFICATE-----
+
+       service.node: j98Nbf765bdiwD5ngks829450ykh287f7vydhGDS2
 
 authorities:
     applications:
          -
           name: "client.node"
           authorities:
-                - "create:account"
-                - "read:account"
-                - "update:account"
-                - "delete:account"
+                - "account"
+         -
+          name: "service.node"
+          authorities:
+                - "finance"

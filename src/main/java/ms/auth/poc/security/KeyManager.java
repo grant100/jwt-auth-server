@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@ConfigurationProperties(prefix = "hmac-keys")
+@ConfigurationProperties(prefix = "client-keys")
 public class KeyManager {
 
     private Map<String, String> keys;

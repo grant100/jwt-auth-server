@@ -46,10 +46,9 @@ public class RuleProcessor {
         Set<String> issuers = keyManager.getIssuers();
         String audience = tokenProperties.getAuthnServerAudience();
 
-        Algorithm algorithm = Algorithm.HMAC256(keyManager.findKey(issuer));
-        CCHeaderRule headerRule = new CCHeaderRule(clientCredential, Arrays.asList("HS256"));
+        CCHeaderRule headerRule = new CCHeaderRule(clientCredential, Arrays.asList(ClaimConstants.HMAC_256,ClaimConstants.RSA_256));
         CCPayloadRule payloadRule = new CCPayloadRule(clientCredential, issuers, audience);
-        CCSignatureRule signatureRule = new CCSignatureRule(clientCredential, algorithm, audience);
+        CCSignatureRule signatureRule = new CCSignatureRule(clientCredential, headerRule.getAlgorithm(keyManager.findKey(issuer)), audience);
         return Arrays.asList(headerRule, payloadRule, signatureRule);
     }
 

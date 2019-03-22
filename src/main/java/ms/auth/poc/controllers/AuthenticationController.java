@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.FileInputStream;
 import java.security.*;
+import java.security.cert.Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
@@ -82,13 +84,15 @@ public class AuthenticationController {
 
     @ResponseBody
     @RequestMapping(value = "/cc")
-    public String cc() {
+    public String cc() throws Exception{
         String token = null;
         try {
             Calendar now = Calendar.getInstance();
             long time = now.getTimeInMillis();
             Date expiry = new Date(time + (1800 * 1000));
-            Algorithm algorithm = Algorithm.HMAC256("j98Nbf765bdiwD5ngks829450ykh287f7vydhGDS1");
+            //Algorithm algorithm = Algorithm.HMAC256("j98Nbf765bdiwD5ngks829450ykh287f7vydhGDS1");
+            KeyPair keyPair = getClientRSA();
+            Algorithm algorithm = Algorithm.RSA256((RSAPublicKey)keyPair.getPublic(),(RSAPrivateKey)keyPair.getPrivate());
             token = com.auth0.jwt.JWT
                     .create()
                     .withIssuer("client.node")
@@ -100,5 +104,25 @@ public class AuthenticationController {
             //
         }
         return token;
+    }
+
+    private KeyPair getClientRSA() throws Exception{
+        String alias = "client";
+        String password = "changeit";
+        String keystorePath = "src/main/resources/client.jks";
+
+        FileInputStream is = new FileInputStream(keystorePath);
+
+        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keystore.load(is, password.toCharArray());
+
+        Key key = keystore.getKey(alias, password.toCharArray());
+
+        KeyPair keyPair = null;
+        if (key instanceof PrivateKey) {
+            Certificate cert = keystore.getCertificate(alias);
+            keyPair = new KeyPair((RSAPublicKey) cert.getPublicKey(), (RSAPrivateKey) key);
+        }
+        return keyPair;
     }
 }

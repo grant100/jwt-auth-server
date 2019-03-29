@@ -14,6 +14,9 @@ public class KeyProperties {
     @Value("${key.ssl.keystore.path}")
     private String keystorePath;
 
+    @Value("${key.ssl.client.keystore.path}")
+    private String clientKeystorePath;
+
     public String getAlias() {
         return alias;
     }
@@ -24,5 +27,9 @@ public class KeyProperties {
 
     public String getKeystorePath() {
         return keystorePath;
+    }
+
+    public String getClientKeystorePath() {
+        return clientKeystorePath;
     }
 }

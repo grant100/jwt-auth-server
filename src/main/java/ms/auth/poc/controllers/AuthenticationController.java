@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 
 import ms.auth.poc.WebSecurity;
 import ms.auth.poc.security.ClaimConstants;
+import ms.auth.poc.security.KeyProperties;
 import ms.auth.poc.security.KeyService;
 import ms.auth.poc.security.TokenProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,13 @@ import java.util.*;
 
 @RestController
 public class AuthenticationController {
+    private KeyProperties keyProperties;
     private KeyService keyService;
     private TokenProperties tokenProperties;
 
     @Autowired
-    public AuthenticationController(KeyService keyService, TokenProperties tokenProperties) {
+    public AuthenticationController(KeyProperties keyProperties, KeyService keyService, TokenProperties tokenProperties) {
+        this.keyProperties = keyProperties;
         this.keyService = keyService;
         this.tokenProperties = tokenProperties;
     }
@@ -108,8 +111,8 @@ public class AuthenticationController {
 
     private KeyPair getClientRSA() throws Exception{
         String alias = "client";
-        String password = "changeit";
-        String keystorePath = "src/main/resources/client.jks";
+        String password = keyProperties.getPassword();
+        String keystorePath = keyProperties.getClientKeystorePath();
 
         FileInputStream is = new FileInputStream(keystorePath);
 

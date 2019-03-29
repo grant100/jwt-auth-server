@@ -8,6 +8,7 @@ import ms.auth.poc.security.ClaimConstants;
 import ms.auth.poc.security.KeyProperties;
 import ms.auth.poc.security.KeyService;
 import ms.auth.poc.security.TokenProperties;
+import ms.auth.poc.security.exceptions.ServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -60,7 +61,7 @@ public class AuthenticationController {
         try {
             token = generate(authentication.getName(), tokenProperties.getAuthnServerIssuer(), claims);
         } catch (Exception e) {
-            // TODO 5? Error Handling Response?
+            throw new ServerException("Encountered processing error!",e);
         }
 
         return token;
@@ -104,7 +105,7 @@ public class AuthenticationController {
                     .withExpiresAt(expiry)
                     .sign(algorithm);
         } catch (Exception uee) {
-            //
+            throw new ServerException("Error processing token",uee);
         }
         return token;
     }
